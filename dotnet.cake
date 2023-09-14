@@ -1,19 +1,18 @@
 #addin nuget:?package=Cake.FileHelpers&version=6.1.3
-
 var configuration = Argument("configuration", "Debug");
 var selfContained = HasArgument("self-contained") || HasArgument("sc");
-var prefix = Argument("prefix", "/usr");
+var prefix = Argument("prefix", "/usr"); // prefix doesn't have to start with a path separator
 
 Task("Clean")
     .Does(() =>
     {
-        CleanDirectory($".{sep}{projectName}.{projectSuffix}{sep}bin{sep}{configuration}");
+        CleanDirectory($"{projectName}.{projectSuffix}{sep}bin{sep}{configuration}");
     });
 
 Task("Build")
     .Does(() =>
     {
-        DotNetBuild($".{sep}{projectName}.{projectSuffix}{sep}{projectName}.{projectSuffix}.csproj", new DotNetBuildSettings
+        DotNetBuild($"{projectName}.{projectSuffix}{sep}{projectName}.{projectSuffix}.csproj", new DotNetBuildSettings
         {
             Configuration = configuration
         });
@@ -23,7 +22,7 @@ Task("Run")
     .IsDependentOn("Build")
     .Does(() =>
     {
-        DotNetRun($".{sep}{projectName}.{projectSuffix}{sep}{projectName}.{projectSuffix}.csproj", new DotNetRunSettings
+        DotNetRun($"{projectName}.{projectSuffix}{sep}{projectName}.{projectSuffix}.csproj", new DotNetRunSettings
         {
             Configuration = configuration,
             NoBuild = true
@@ -42,7 +41,7 @@ Task("Publish")
         var libDir = string.IsNullOrEmpty(prefix) ? "lib" : $"{prefix}{sep}lib";
         var publishDir = $"{outDir}{libDir}{sep}{appId}";
         var exitCode = 0;
-        DotNetPublish($".{sep}{projectName}.{projectSuffix}{sep}{projectName}.{projectSuffix}.csproj", new DotNetPublishSettings
+        DotNetPublish($"{projectName}.{projectSuffix}{sep}{projectName}.{projectSuffix}.csproj", new DotNetPublishSettings
         {
             Configuration = "Release",
             SelfContained = selfContained,
@@ -68,10 +67,10 @@ Task("Publish")
         }
     });
 
-private void PostPublishLinux(string outDir, string prefix, string libDir)
+void PostPublishLinux(string outDir, string prefix, string libDir)
 {
-    var binDir = string.IsNullOrEmpty(prefix) ? $"{outDir}{sep}bin" : $"{outDir}{prefix}{sep}bin";
-    var shareDir = string.IsNullOrEmpty(prefix) ? $"{outDir}{sep}share" : $"{outDir}{prefix}{sep}share";
+    var binDir = string.IsNullOrEmpty(prefix) ? $"{outDir}/bin" : $"{outDir}{prefix}/bin";
+    var shareDir = string.IsNullOrEmpty(prefix) ? $"{outDir}/share" : $"{outDir}{prefix}/share";
     // Add launch script
     CreateDirectory(binDir);
     CopyFileToDirectory($"./{projectName}.Shared/{appId}.in", binDir);
@@ -108,18 +107,18 @@ private void PostPublishLinux(string outDir, string prefix, string libDir)
     DeleteFile($"{metainfoDir}/{appId}.metainfo.xml.in");
 }
 
-private void PostPublishGNOME(string outDir, string prefix, string libDir)
+void PostPublishGNOME(string outDir, string prefix, string libDir)
 {
     var shareDir = string.IsNullOrEmpty(prefix) ? $"{outDir}{sep}share" : $"{outDir}{prefix}{sep}share";
     // Add gresource
     CreateDirectory($"{shareDir}{sep}{appId}");
     MoveFileToDirectory($"{outDir}{libDir}{sep}{appId}{sep}{appId}.gresource", $"{shareDir}{sep}{appId}");
     // Add DBus service (if exists)
-    if (FileExists($".{sep}{projectName}.GNOME{sep}{appId}.service.in"))
+    if (FileExists($"{projectName}.GNOME{sep}{appId}.service.in"))
     {
         var servicesDir = $"{shareDir}{sep}dbus-1{sep}services";
         CreateDirectory(servicesDir);
-        CopyFileToDirectory($".{sep}{projectName}.GNOME{sep}{appId}.service.in", servicesDir);
+        CopyFileToDirectory($"{projectName}.GNOME{sep}{appId}.service.in", servicesDir);
         ReplaceTextInFiles($"{servicesDir}{sep}{appId}.service.in", "@PREFIX@", $"{prefix}");
         MoveFile($"{servicesDir}{sep}{appId}.service.in", $"{servicesDir}{sep}{appId}.service");
         FileAppendLines($"{shareDir}{sep}applications{sep}{appId}.desktop" , new string[] { "DBusActivatable=true" });

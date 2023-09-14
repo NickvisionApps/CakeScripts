@@ -71,7 +71,7 @@ Task("DocsUpdateHtml")
     });
 
 Task("DocsUpdateAll")
-    .DependsOn("DocsGeneratePot")
-    .DependsOn("DocsUpdatePo")
-    .DependsOn("DocsUpdateYelp")
-    .DependsOn("DocsUpdateHtml")
+    .IsDependentOn("DocsGeneratePot")
+    .IsDependentOn("DocsUpdatePo")
+    .IsDependentOn("DocsUpdateYelp")
+    .IsDependentOn("DocsUpdateHtml");
