@@ -4,12 +4,17 @@
 
 var target = Argument<string>("target");
 var ui = Argument("ui", "");
+var requiresUI = target switch
+{
+    "Clean" or "Build" or "Run" or "Publish" or "FlatpakSourcesGen" => true,
+    _ => false
+};
 var projectSuffix = ui.ToLower() switch
 {
     "gnome" => "GNOME",
     _ => ""
 };
-if (string.IsNullOrEmpty(projectSuffix))
+if (string.IsNullOrEmpty(projectSuffix) && requiresUI)
 {
     throw new CakeException("Unknown UI. Possible values: gnome.");
 }
