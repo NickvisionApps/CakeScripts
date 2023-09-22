@@ -1,8 +1,16 @@
 Task("GeneratePot")
     .Does(() =>
     {
+        var dirs = $"-s .{sep}{projectName}.Shared";
+        foreach (var dir in new []{ $"{projectName}.GNOME", $"{projectName}.WinUI" })
+        {
+            if (DirectoryExists(dir))
+            {
+                dirs = $"{dirs} -s .{sep}{dir}";
+            }
+        }
         StartProcess("GetText.Extractor", new ProcessSettings {
-            Arguments = $"-o -s .{sep}{projectName}.GNOME -s .{sep}{projectName}.Shared -as \"_\" -ad \"_p\" -ap \"_n\" -adp \"_pn\" -t .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{shortName}.pot"
+            Arguments = $"-o {dirs} -as \"_\" -ad \"_p\" -ap \"_n\" -adp \"_pn\" -t .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{shortName}.pot"
         });
         StartProcess("sh", new ProcessSettings {
             Arguments = $"-c \"xgettext --from-code=UTF-8 --add-comments --keyword=_ --keyword=C_:1c,2 -o .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{shortName}.pot -j .{sep}{projectName}.GNOME{sep}Blueprints{sep}*.blp\""
