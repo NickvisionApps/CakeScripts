@@ -32,6 +32,12 @@ Task("Run")
 Task("Publish")
     .Does(() =>
     {
+        var runtime = Argument("runtime", "");
+        if (string.IsNullOrEmpty(runtime))
+        {
+            runtime = IsRunningOnLinux() ? "linux-" : "win-";
+            runtime += System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
+        }
         var outDir = EnvironmentVariable("NICK_BUILDDIR", "_nickbuild");
         CleanDirectory(outDir);
         if (!prefix.StartsWith(sep))
@@ -41,12 +47,14 @@ Task("Publish")
         var libDir = string.IsNullOrEmpty(prefix) ? "lib" : $"{prefix}{sep}lib";
         var publishDir = $"{outDir}{libDir}{sep}{appId}";
         var exitCode = 0;
+        Information($"Publishing {projectName}.{projectSuffix} ({runtime})...");
         DotNetPublish($"{projectName}.{projectSuffix}{sep}{projectName}.{projectSuffix}.csproj", new DotNetPublishSettings
         {
             Configuration = "Release",
             SelfContained = selfContained,
             OutputDirectory = publishDir,
             Sources = Argument("sources", "").Split(" "),
+            Runtime = runtime,
             HandleExitCode = code => {
                 exitCode = code;
                 return false;
