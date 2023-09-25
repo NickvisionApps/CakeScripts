@@ -9,12 +9,21 @@ Task("GeneratePot")
                 dirs = $"{dirs} -s .{sep}{dir}";
             }
         }
-        StartProcess("GetText.Extractor", new ProcessSettings {
+        StartProcess($"GetText.Extractor{(IsRunningOnWindows() ? ".exe" : "")}", new ProcessSettings {
             Arguments = $"-o {dirs} -as \"_\" -ad \"_p\" -ap \"_n\" -adp \"_pn\" -t .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{shortName}.pot"
         });
-        StartProcess("sh", new ProcessSettings {
-            Arguments = $"-c \"xgettext --from-code=UTF-8 --add-comments --keyword=_ --keyword=C_:1c,2 -o .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{shortName}.pot -j .{sep}{projectName}.GNOME{sep}Blueprints{sep}*.blp\""
-        });
+        if (IsRunningOnWindows())
+        {
+            StartProcess("powershell", new ProcessSettings {
+                Arguments = $"-Command \"xgettext --from-code=UTF-8 --add-comments --keyword=_ --keyword=C_:1c,2 -o .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{shortName}.pot -j .{sep}{projectName}.GNOME{sep}Blueprints{sep}*.blp\""
+            });
+        }
+        else
+        {
+            StartProcess("sh", new ProcessSettings {
+                Arguments = $"-c \"xgettext --from-code=UTF-8 --add-comments --keyword=_ --keyword=C_:1c,2 -o .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{shortName}.pot -j .{sep}{projectName}.GNOME{sep}Blueprints{sep}*.blp\""
+            });
+        }
         StartProcess("xgettext", new ProcessSettings {
             Arguments = $"-o .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{shortName}.pot -j .{sep}{projectName}.Shared{sep}{appId}.desktop.in"
         });
