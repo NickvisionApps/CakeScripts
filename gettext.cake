@@ -37,6 +37,7 @@ Task("UpdatePo")
     {
         foreach (var lang in FileReadLines($".{sep}{projectName}.Shared{sep}Resources{sep}po{sep}LINGUAS"))
         {
+            Information($"Updating PO for {lang}...");
             StartProcess("msgmerge", new ProcessSettings {
                 Arguments = $"-U .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{lang}.po .{sep}{projectName}.Shared{sep}Resources{sep}po{sep}{shortName}.pot"
             });

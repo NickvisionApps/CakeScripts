@@ -1,7 +1,7 @@
 #addin nuget:?package=Cake.FileHelpers&version=6.1.3
 var configuration = Argument("configuration", "Debug");
 var selfContained = HasArgument("self-contained") || HasArgument("sc");
-var prefix = Argument("prefix", "/usr"); // prefix doesn't have to start with a path separator
+var prefix = Argument("prefix", IsRunningOnLinux() ? "/usr" : "\\app"); // prefix doesn't have to start with a path separator
 
 Task("Clean")
     .Does(() =>

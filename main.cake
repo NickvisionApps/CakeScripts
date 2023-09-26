@@ -20,3 +20,12 @@ if ((string.IsNullOrEmpty(projectSuffix) || !projectsToBuild.Contains(projectSuf
 #load local:?path=gettext.cake
 #load local:?path=packaging.cake
 RunTarget(target);
+
+// Helper method for Linux-only tasks
+void EnsureLinux()
+{
+    if (!IsRunningOnLinux())
+    {
+        throw new CakeException("This task can only be executed on Linux.");
+    }
+}

@@ -2,10 +2,7 @@
 Task("FlatpakBuild")
     .Does(() =>
     {
-        if (!IsRunningOnLinux())
-        {
-            throw new CakeException("This task can only be executed on Linux.");
-        }
+        EnsureLinux();
         StartProcess("flatpak", new ProcessSettings
         {
             Arguments = $"run org.flatpak.Builder --force-clean --disable-rofiles-fuse _build flatpak/{appId}.json"
@@ -15,10 +12,7 @@ Task("FlatpakBuild")
 Task("FlatpakRun")
     .Does(() =>
     {
-        if (!IsRunningOnLinux())
-        {
-            throw new CakeException("This task can only be executed on Linux.");
-        }
+        EnsureLinux();
         var uid = EnvironmentVariable("UID", "1000");
         StartProcess("flatpak", new ProcessSettings
         {

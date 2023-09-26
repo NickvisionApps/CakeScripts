@@ -1,6 +1,7 @@
 Task("DocsGeneratePot")
     .Does(() =>
     {
+        EnsureLinux();
         StartProcess("sh", new ProcessSettings {
             Arguments = $"-c \"itstool -o po{sep}{shortName}.pot yelp{sep}C{sep}*.page\"",
             WorkingDirectory = $"{projectName}.Shared{sep}Docs"
@@ -10,8 +11,10 @@ Task("DocsGeneratePot")
 Task("DocsUpdatePo")
     .Does(() =>
     {
+        EnsureLinux();
         foreach (var lang in FileReadLines($".{sep}{projectName}.Shared{sep}Docs{sep}po{sep}LINGUAS"))
         {
+            Information($"Updating PO for {lang}...");
             StartProcess("msgmerge", new ProcessSettings {
                 Arguments = $"-U .{sep}{projectName}.Shared{sep}Docs{sep}po{sep}{lang}.po .{sep}{projectName}.Shared{sep}Docs{sep}po{sep}{shortName}.pot"
             });
@@ -21,8 +24,10 @@ Task("DocsUpdatePo")
 Task("DocsUpdateYelp")
     .Does(() =>
     {
+        EnsureLinux();
         foreach (var lang in FileReadLines($".{sep}{projectName}.Shared{sep}Docs{sep}po{sep}LINGUAS"))
         {
+            Information($"Updating Yelp docs for {lang}...");
             StartProcess("msgfmt", new ProcessSettings {
                 Arguments = $"{lang}.po -o {lang}.mo",
                 WorkingDirectory = $"{projectName}.Shared{sep}Docs{sep}po"
@@ -41,10 +46,12 @@ Task("DocsUpdateYelp")
 Task("DocsUpdateHtml")
     .Does(() =>
     {
+        EnsureLinux();
         //C for english
         CreateDirectory($"{projectName}.Shared{sep}Docs{sep}html{sep}C");
         CreateDirectory($"{projectName}.Shared{sep}Docs{sep}html{sep}C{sep}figures");
         CopyDirectory($"{projectName}.Shared{sep}Docs{sep}yelp{sep}C{sep}figures", $"{projectName}.Shared{sep}Docs{sep}html{sep}C{sep}figures");
+        Information("Generating html for C...");
         StartProcess("yelp-build", new ProcessSettings {
             Arguments = $"html -o html{sep}C{sep} yelp{sep}C{sep}",
             WorkingDirectory = $"{projectName}.Shared{sep}Docs"
@@ -52,6 +59,7 @@ Task("DocsUpdateHtml")
         //Other langs
         foreach (var lang in FileReadLines($".{sep}{projectName}.Shared{sep}Docs{sep}po{sep}LINGUAS"))
         {
+            Information($"Generating html for {lang}...");
             CreateDirectory($"{projectName}.Shared{sep}Docs{sep}html{sep}{lang}");
             StartProcess("yelp-build", new ProcessSettings {
                 Arguments = $"html -o html{sep}{lang}{sep} yelp{sep}{lang}{sep}",
