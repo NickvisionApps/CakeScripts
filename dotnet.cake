@@ -81,7 +81,7 @@ void PostPublishLinux(string outDir, string prefix, string libDir)
     var shareDir = string.IsNullOrEmpty(prefix) ? $"{outDir}/share" : $"{outDir}{prefix}/share";
     // Add launch script
     CreateDirectory(binDir);
-    CopyFileToDirectory($"./{projectName}.Shared/{appId}.in", binDir);
+    CopyFileToDirectory($"./{projectName}.Shared/Linux/{appId}.in", binDir);
     ReplaceTextInFiles($"{binDir}/{appId}.in", "@EXEC@", selfContained ? $"{libDir}/{appId}/{projectName}.{projectSuffix}" : $"dotnet {libDir}/{appId}/{projectName}.{projectSuffix}.dll");
     MoveFile($"{binDir}/{appId}.in", $"{binDir}/{appId}");
     StartProcess("chmod", new ProcessSettings{
@@ -98,7 +98,7 @@ void PostPublishLinux(string outDir, string prefix, string libDir)
     // Add desktop file
     var desktopDir = $"{shareDir}/applications";
     CreateDirectory(desktopDir);
-    CopyFileToDirectory($"./{projectName}.Shared/{appId}.desktop.in", desktopDir);
+    CopyFileToDirectory($"./{projectName}.Shared/Linux/{appId}.desktop.in", desktopDir);
     ReplaceTextInFiles($"{desktopDir}/{appId}.desktop.in", "@EXEC@", $"{prefix}/bin/{appId}");
     StartProcess("msgfmt", new ProcessSettings {
         Arguments = $"--desktop --template={desktopDir}/{appId}.desktop.in -o {desktopDir}/{appId}.desktop -d ./{projectName}.Shared/Resources/po/"
@@ -107,8 +107,7 @@ void PostPublishLinux(string outDir, string prefix, string libDir)
     // Add metainfo file
     var metainfoDir = $"{shareDir}/metainfo";
     CreateDirectory(metainfoDir);
-    CopyFileToDirectory($"./{projectName}.Shared/{appId}.metainfo.xml.in", metainfoDir);
-    ReplaceTextInFiles($"{metainfoDir}/{appId}.metainfo.xml.in", "@PROJECT@", $"{projectName}.{projectSuffix}");
+    CopyFileToDirectory($"./{projectName}.Shared/Linux/{appId}.metainfo.xml.in", metainfoDir);
     StartProcess("msgfmt", new ProcessSettings {
         Arguments = $"--xml --template={metainfoDir}/{appId}.metainfo.xml.in -o {metainfoDir}/{appId}.metainfo.xml -d ./{projectName}.Shared/Resources/po/"
     });
