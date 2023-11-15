@@ -112,6 +112,13 @@ void PostPublishLinux(string outDir, string prefix, string libDir)
         Arguments = $"--xml --template={metainfoDir}/{appId}.metainfo.xml.in -o {metainfoDir}/{appId}.metainfo.xml -d ./{projectName}.Shared/Resources/po/"
     });
     DeleteFile($"{metainfoDir}/{appId}.metainfo.xml.in");
+    // Add extension file
+    if (FileExists($"{projectName}.Shared/Linux/{appId}.extension.xml"))
+    {
+        var mimeDir = $"{shareDir}/mime/packages";
+        CreateDirectory(mimeDir);
+        CopyFileToDirectory($"{projectName}.Shared/Linux/{appId}.extension.xml", mimeDir);
+    }
 }
 
 void PostPublishGNOME(string outDir, string prefix, string libDir)
