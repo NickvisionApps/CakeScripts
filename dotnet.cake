@@ -108,6 +108,7 @@ void PostPublishLinux(string outDir, string prefix, string libDir)
     var metainfoDir = $"{shareDir}/metainfo";
     CreateDirectory(metainfoDir);
     CopyFileToDirectory($"./{projectName}.Shared/Linux/{appId}.metainfo.xml.in", metainfoDir);
+    ReplaceTextInFiles($"{metainfoDir}/{appId}.metainfo.xml.in", "@PROJECT@", $"{projectName}.{projectSuffix}");
     StartProcess("msgfmt", new ProcessSettings {
         Arguments = $"--xml --template={metainfoDir}/{appId}.metainfo.xml.in -o {metainfoDir}/{appId}.metainfo.xml -d ./{projectName}.Shared/Resources/po/"
     });
